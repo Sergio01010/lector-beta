@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lector Beta</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="pin-container">
+    <h2>Ingrese PIN</h2>
+    <input type="password" id="pin-input" placeholder="PIN" />
+    <button onclick="verificarPIN()">Entrar</button>
+    <p id="pin-error" class="error"></p>
+  </div>
+
+  <div id="app-container" style="display:none;">
+    <h2>Registro de Usuarios</h2>
+    <input type="text" id="nombre" placeholder="Nombre del usuario" />
+    <button onclick="registrarUsuarioConHuella()">Registrar con huella</button>
+    <button onclick="autenticarYRegistrarAsistencia()">Registrar asistencia con huella</button>
+    <button onclick="borrarHistorial()">🗑 Borrar historial</button>
+
+    <h2>Historial de Asistencia</h2>
+    <ul id="historial"></ul>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lector Beta</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f8f8f8;
+      color: #333;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      font-size: 16px;
+      width: 100%;
+      max-width: 300px;
+      box-sizing: border-box;
+    }
+
+    button {
+      cursor: pointer;
+      background-color: #0c7b93;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #095a6b;
+    }
+
+    h2 {
+      color: #0c7b93;
+    }
+
+    .error {
+      color: red;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      background: #e4f0f5;
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="pin-container">
+    <h2>Ingrese PIN</h2>
+    <input type="password" id="pin-input" placeholder="PIN" />
+    <button onclick="verificarPIN()">Entrar</button>
+    <p id="pin-error" class="error"></p>
+  </div>
+
+  <div id="app-container" style="display:none;">
+    <h2>Registro de Usuarios</h2>
+    <input type="text" id="nombre" placeholder="Nombre del usuario" />
+    <button onclick="registrarUsuario()">Registrar usuario</button>
+    <button onclick="registrarAsistencia()">Registrar asistencia</button>
+    <button onclick="borrarHistorial()">🗑 Borrar historial</button>
+
+    <h2>Historial de Asistencia</h2>
+    <ul id="historial"></ul>
+  </div>
+
+  <script>
+    const PIN_CORRECTO = "1834";
+    let historial = JSON.parse(localStorage.getItem("historial_asistencia")) || {};
+    let usuarios = JSON.parse(localStorage.getItem("usuarios")) || {};
+
+    function verificarPIN() {
+      const pinInput = document.getElementById("pin-input").value;
+      if (pinInput === PIN_CORRECTO) {
+        document.getElementById("pin-container").style.display = "none";
+        document.getElementById("app-container").style.display = "block";
+        actualizarHistorialUI();
+      } else {
+        document.getElementById("pin-error").textContent = "PIN incorrecto.";
+      }
+    }
+
+    function registrarUsuario() {
+      const nombre = document.getElementById("nombre").value.trim();
+      if (!nombre) return alert("Escribe un nombre primero");
+
+      if (usuarios[nombre]) {
+        alert("El usuario ya está registrado.");
+        return;
+      }
+
+      usuarios[nombre] = true;
+      localStorage.setItem("usuarios", JSON.stringify(usuarios));
+      alert(`Usuario ${nombre} registrado.`);
+      document.getElementById("nombre").value = "";
+    }
+
+    function registrarAsistencia() {
+      const nombre = document.getElementById("nombre").value.trim();
+      if (!nombre) return alert("Escribe tu nombre primero");
+      if (!usuarios[nombre]) return alert("El usuario no está registrado.");
+
+      const ahora = new Date();
+      const fecha = ahora.toLocaleDateString("es-CO");
+      const hora = ahora.toLocaleTimeString("es-CO");
+
+      const asistencia = {
+        nombre: nombre,
+        tipo: "Asistencia",
+        fecha: fecha,
+        hora: hora
+      };
+
+      historial[`${nombre}-${fecha}-${hora}`] = asistencia;
+      localStorage.setItem("historial_asistencia", JSON.stringify(historial));
+      actualizarHistorialUI();
+
+      alert(`Asistencia registrada para ${nombre} a las ${hora}`);
+    }
+
+    function actualizarHistorialUI() {
+      const historialUl = document.getElementById("historial");
+      historialUl.innerHTML = "";
+      Object.values(historial).forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.nombre} - ${item.tipo} - ${item.fecha} ${item.hora}`;
+        historialUl.appendChild(li);
+      });
+    }
+
+    function borrarHistorial() {
+      if (confirm("¿Estás seguro de borrar el historial?")) {
+        historial = {};
+        localStorage.removeItem("historial_asistencia");
+        actualizarHistorialUI();
+      }
+    }
+  </script>
+</body>
+</html>
